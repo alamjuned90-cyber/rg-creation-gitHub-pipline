@@ -12,10 +12,9 @@ my_job:
 name: Create Resource Group
 runs-on: ubuntu-latest
 
-```
 steps:
-  - name: Checkout Code
-    uses: actions/checkout@v4
+  # name: Checkout Code
+   # uses: actions/checkout@v4
 
   - name: Azure Login
     uses: azure/login@v3
