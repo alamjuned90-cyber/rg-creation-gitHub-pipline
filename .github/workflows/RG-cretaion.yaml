@@ -1,0 +1,41 @@
+name: CI
+
+on:
+workflow_dispatch:
+
+permissions:
+id-token: write
+contents: read
+
+jobs:
+my_job:
+name: Create Resource Group
+runs-on: ubuntu-latest
+
+```
+steps:
+  - name: Checkout Code
+    uses: actions/checkout@v4
+
+  - name: Azure Login
+    uses: azure/login@v3
+    with:
+      client-id: f24800b2-6501-483e-8e7e-9886f9e2d910
+      tenant-id: 58402319-9955-46a8-b85d-85507d1d9708
+      subscription-id: bc901ec6-6856-482d-8884-ffc26339ee5b
+
+  - name: Setup Terraform
+    uses: hashicorp/setup-terraform@v3
+
+  - name: Terraform Init
+    run: terraform init
+
+  - name: Terraform Validate
+    run: terraform validate
+
+  - name: Terraform Plan
+    run: terraform plan
+
+  - name: Terraform Apply
+    run: terraform apply -auto-approve
+```
