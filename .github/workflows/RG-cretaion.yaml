@@ -9,31 +9,36 @@ permissions:
 
 jobs:
   my_job:
-   name: Create Resource Group
-   runs-on: ubuntu-latest
+    name: Create Resource Group
+    runs-on: ubuntu-latest        # ✅ steps must be indented inside the job
+    steps:
+      - name: Checkout repository  # ✅ REQUIRED — gives runner access to your .tf files
+        uses: actions/checkout@v4
 
-steps:
-  # name: Checkout Code
-   # uses: actions/checkout@v4
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: f24800b2-6501-483e-8e7e-9886f9e2d910       # ✅ use secrets, not hardcoded values
+          tenant-id: 58402319-9955-46a8-b85d-85507d1d9708
+          subscription-id: bc901ec6-6856-482d-8884-ffc26339ee5b
 
-  - name: Azure Login
-    uses: azure/login@v3
-    with:
-      client-id: f24800b2-6501-483e-8e7e-9886f9e2d910
-      tenant-id: 58402319-9955-46a8-b85d-85507d1d9708
-      subscription-id: bc901ec6-6856-482d-8884-ffc26339ee5b
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.8.0"   # ✅ pin a version for reproducibility
 
-  - name: Setup Terraform
-    uses: hashicorp/setup-terraform@v3
+      - name: Terraform Init
+        run: terraform init
+        working-directory: ./infra     # ✅ set this to wherever your .tf files live
 
-  - name: Terraform Init
-    run: terraform init
+      - name: Terraform Validate
+        run: terraform validate
+        working-directory: ./infra
 
-  - name: Terraform Validate
-    run: terraform validate
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan   # ✅ save plan file so Apply uses exact same plan
+        working-directory: ./infra
 
-  - name: Terraform Plan
-    run: terraform plan
-
-  - name: Terraform Apply
-    run: terraform apply -auto-approve
+      - name: Terraform Apply
+        run: terraform apply -auto-approve tfplan   # ✅ apply the saved plan, not a new one
+        working-directory: ./infra
